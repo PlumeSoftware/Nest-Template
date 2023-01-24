@@ -3,7 +3,7 @@ import { Transporter, createTransport, SendMailOptions } from 'nodemailer'
 import { serverEmail } from '../../lib/config/backend';
 
 @Injectable()
-export class ContactService {
+export class MailService {
     public async sendEmail(title: string, content: string, receiver: string): Promise<void> {
         const transporter: Transporter = createTransport(serverEmail)
         const options: SendMailOptions = {
