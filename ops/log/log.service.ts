@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MailService } from 'ops/mail/mail.service';
 import { Repository } from 'typeorm';
 import { Log } from '../../lib/entity/meta/log';
 
 @Injectable()
 export class LogService {
     constructor(
+        private readonly mailService: MailService,
         @InjectRepository(Log)
         private readonly logRepository: Repository<Log>,
     ) { }
