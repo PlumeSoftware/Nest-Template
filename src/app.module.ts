@@ -5,11 +5,10 @@ import { meta } from '../lib/entity/meta';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from '../auth/guard/auth.guard';
 import { LogService } from '../ops/log/log.service';
-import { projectServer, serverEmail, databaseConfig } from '../lib/config/backend'
 import { MailService } from '../ops/mail/mail.service';
 @Module({
   imports: [
-    ConfigModule.forRoot({ load: [() => projectServer, () => serverEmail, () => databaseConfig] }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
