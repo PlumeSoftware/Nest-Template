@@ -1,0 +1,35 @@
+import { BaseReq, } from "../../lib/common";
+import { BaseEntity, Column, Entity, Generated, PrimaryColumn } from "typeorm";
+
+@Entity({ name: "entityName" })
+export class EntityName extends BaseEntity {
+  @PrimaryColumn({ name: "entityName_id", type: "varchar" })
+  @Generated("uuid")
+  entityNameId: string;
+  @Column({ name: "entityName_name", type: "varchar", length: 30, nullable: true })
+  entityNameName: string;
+  @Column({ name: "create_time", type: "datetime" })
+  create_time: Date;
+  @Column({ name: "update_time", nullable: true, type: "datetime" })
+  update_time: Date;
+  @Column({ name: "create_user", nullable: true, type: "varchar" })
+  create_user: string;
+  @Column({ name: "update_user", nullable: true, type: "varchar" })
+  update_user: string;
+}
+
+export interface EntityNameReq extends BaseReq {
+  readonly entityNameId: string;
+  readonly entityNameName: string;
+}
+
+export class EntityNameDto {
+  entityNameId: string;
+  entityNameName: string;
+
+  constructor(entityName: EntityName) {
+    this.entityNameId = entityName.entityNameId;
+    this.entityNameName = entityName.entityNameName;
+  }
+}
+

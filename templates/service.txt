@@ -1,0 +1,45 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { EntityName } from './entityName.entity';
+import { EntityNameDto } from './entityName.entity';
+
+
+@Injectable()
+export class EntityNameService {
+    constructor(
+        @InjectRepository(EntityName)
+        private readonly entityNameRepository: Repository<EntityName>
+    ) { }
+
+    public async getAllEntityNames(page: number = 1): Promise<EntityNameDto[]> {
+        return await this.entityNameRepository.find({ take: 10 * (page - 1), skip: 10 * page });
+    }
+
+    public async getEntityNameById(entityNameId: string): Promise<EntityName> {
+        const target = await this.entityNameRepository.findOne({ where: { entityNameId } });
+        if (target) {
+            return target;
+        } else {
+            throw new Error('entityNameId is not exist');
+        }
+    }
+
+    public async saveEntityName(entityNameId:string, entityNameName:string): Promise<void> {
+        const target = await this.entityNameRepository.findOne({ where: { entityNameId: entityNameId } });
+        if (target) {
+            await this.entityNameRepository.update({ entityNameId }, { entityNameName });
+        } else {
+            await this.entityNameRepository.insert({ entityNameName });
+        }
+    }
+
+    public async deleteEntityName(entityNameId: string): Promise<void> {
+        const target = await this.entityNameRepository.findOne({ where: { entityNameId: entityNameId } });
+        if (target) {
+            await this.entityNameRepository.delete(entityNameId);
+        } else {
+            throw new Error('entityNameId is not exist');
+        }
+    }
+}

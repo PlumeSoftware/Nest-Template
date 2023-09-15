@@ -1,0 +1,50 @@
+import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
+import { EntityNameService } from './entityName.service';
+import { EntityNameReq } from './entityName.entity';
+import { BaseRes, Code } from '../../lib/common';
+
+@Controller('entityName')
+export class EntityNameController {
+  constructor(
+    private readonly entityNameService: EntityNameService
+  ) { }
+  @Get('list')
+  public async getAllEntityNames(@Headers() header: { userId: string }, @Query('page') page: number): Promise<BaseRes> {
+    try {
+      const result = await this.entityNameService.getAllEntityNames(page);
+      return new BaseRes(Code.SUCCESS, result);
+    } catch (e) {
+      return new BaseRes(Code.ERROR, e.message);
+    }
+  }
+
+  @Get('detail')
+  public async getEntityNameById(@Headers() header: { userId: string }, @Query() query: EntityNameReq): Promise<BaseRes> {
+    try {
+      const result = await this.entityNameService.getEntityNameById(query.entityNameId);
+      return new BaseRes(Code.SUCCESS, result);
+    } catch (e) {
+      return new BaseRes(Code.ERROR, e.message);
+    }
+  }
+
+  @Post('save')
+  public async saveEntityName(@Headers() header: { userId: string }, @Body() body: EntityNameReq): Promise<BaseRes> {
+    try {
+      await this.entityNameService.saveEntityName(body.entityNameId, body.entityNameName);
+      return new BaseRes(Code.SUCCESS);
+    } catch (e) {
+      return new BaseRes(Code.ERROR, e.message);
+    }
+  }
+
+  @Post('delete')
+  public async deleteEntityName(@Headers() header: { userId: string }, @Body() body: EntityNameReq): Promise<BaseRes> {
+    try {
+      await this.entityNameService.deleteEntityName(body.entityNameId);
+      return new BaseRes(Code.SUCCESS);
+    }catch(e){
+      return new BaseRes(Code.ERROR, e.message);
+    }
+  }
+}

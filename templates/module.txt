@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+import { EntityNameService } from './entityName.service';
+import { EntityNameController } from './entityName.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { EntityName } from './entityName.entity';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([EntityName])
+  ],
+  providers: [EntityNameService],
+  controllers: [EntityNameController],
+  exports: [EntityNameService]
+})
+export class EntityNameModule { }
