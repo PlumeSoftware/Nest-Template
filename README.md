@@ -1,4 +1,4 @@
-# 引力岛Trip小程序
+# NestJS-Template Nest后端模板
 
 ## 项目介绍
 基于Nest.js + TypeOrm，对接MySQL
