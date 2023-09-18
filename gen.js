@@ -16,30 +16,42 @@ const capEntityName = entityName.substring(0, 1).toUpperCase() + entityName.subs
 
 if (!fs.existsSync(path.resolve(__dirname, `./src/${entityName}`))) {
     fs.mkdirSync(path.resolve(__dirname, `./src/${entityName}`));
-}else{
+} else {
     throw new Error(`${entityName} already exists`);
 }
 
 //生成controller.js
 const controllerContent = controllerTemplate.replaceAll('entityName', entityName).replaceAll('EntityName', capEntityName);
-fs.writeFileSync(path.resolve(__dirname, `./src/${entityName}/${entityName}.controller.ts`), controllerContent);
 console.log(`${capEntityName} Controller created`);
 
 //生成service.js
 const serviceContent = serviceTemplate.replaceAll('entityName', entityName).replaceAll('EntityName', capEntityName);
-fs.writeFileSync(path.resolve(__dirname, `./src/${entityName}/${entityName}.service.ts`), serviceContent);
 console.log(`${capEntityName} Service created`);
 
 //生成module.js
 const moduleContent = moduleTemplate.replaceAll('entityName', entityName).replaceAll('EntityName', capEntityName);
-fs.writeFileSync(path.resolve(__dirname, `./src/${entityName}/${entityName}.module.ts`), moduleContent);
 console.log(`${capEntityName} Module created`);
 
 //生成entity.js
 const entityContent = entityTemplate.replaceAll('entityName', entityName).replaceAll('EntityName', capEntityName);
-fs.writeFileSync(path.resolve(__dirname, `./src/${entityName}/${entityName}.entity.ts`), entityContent);
-console.log(`${capEntityName} Entity created`);
 
+//读取lib/entity.ts文件
+const entityPath = path.resolve(__dirname, './lib/entity.ts');
+const entityFileContent = fs.readFileSync(entityPath, 'utf8');
+//检查是否已经存在同名entity
+console.log(entityFileContent);
+if (entityFileContent.indexOf(`import { ${capEntityName} } from '../src/${entityName}/${entityName}.entity';`) !== -1) {
+    throw new Error(`${capEntityName} already exists`);
+}
+
+// 在第一个空行后加入import { EntityNameEntity } from '../src/entityName/entityName.entity';
+const entityImportContent = `import { ${capEntityName} } from '../src/${entityName}/${entityName}.entity';\n`;
+console.log(entityImportContent);
+let entityFirstEmptyLineIndex = entityFileContent.indexOf('\n\n');
+entityFirstEmptyLineIndex = entityFirstEmptyLineIndex < 0 ? 0 : entityFirstEmptyLineIndex;
+let newEntityFileContent = entityFileContent.slice(0, entityFirstEmptyLineIndex) + entityImportContent + entityFileContent.slice(entityFirstEmptyLineIndex);
+const entitiesIndex = newEntityFileContent.indexOf('const entities = [');
+newEntityFileContent = newEntityFileContent.slice(0, entitiesIndex + 18) + `\n    ${capEntityName},` + newEntityFileContent.slice(entitiesIndex + 18);
 
 //读取src/app.module.ts文件
 const appModulePath = path.resolve(__dirname, './src/app.module.ts');
@@ -56,4 +68,11 @@ let newAppModuleContent = appModuleContent.slice(0, firstEmptyLineIndex) + impor
 //找到imports: []，在[]中加入EntityNameModule
 const importsIndex = newAppModuleContent.indexOf('imports: [');
 newAppModuleContent = newAppModuleContent.slice(0, importsIndex + 10) + `\n    ${capEntityName}Module,` + newAppModuleContent.slice(importsIndex + 10);
+
+fs.writeFileSync(path.resolve(__dirname, `./src/${entityName}/${entityName}.controller.ts`), controllerContent);
+fs.writeFileSync(path.resolve(__dirname, `./src/${entityName}/${entityName}.service.ts`), serviceContent);
+fs.writeFileSync(path.resolve(__dirname, `./src/${entityName}/${entityName}.module.ts`), moduleContent);
+
+fs.writeFileSync(path.resolve(__dirname, `./src/${entityName}/${entityName}.entity.ts`), entityContent);
+fs.writeFileSync(entityPath, newEntityFileContent);
 fs.writeFileSync(appModulePath, newAppModuleContent);
